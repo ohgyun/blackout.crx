@@ -3,8 +3,24 @@
 <head>
 <meta charset="utf-8">
 <title>blackout</title>
+<style type="text/css">
+.blind {display:none}
+</style>
+<!-- Syntax Highlighter -->
+<link href="../syntaxhighlighter/shCore.css" rel="stylesheet" type="text/css" />
+<link href="../syntaxhighlighter/shThemeDefault.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../syntaxhighlighter/shCore.js"></script>
+<script type="text/javascript" src="../syntaxhighlighter/shBrushJScript.js"></script>
+<!-- //Syntax Highlighter -->
+
 </head>
 <body>
+<h1>Blacker - blackout</h1>
+<p>Wait 3 seconds or push Ctrl + `</p>
+<button id="btn-style1">Black Out with Style1</button>
+<button id="btn-style2">Black Out with Style2</button>
+<button id="btn-style3">Black Out with Style3</button>
+<div id="code"></div>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js"></script>
 <script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
 <script type="text/javascript" src="blackout.js"></script>
@@ -37,7 +53,9 @@
 	};
 	
 }());
+</script>
 
+<textarea id="style1" class="blind">
 var blacker = blackout.blacker();
 blacker.blackOut = function (wrapper, width, height) {
 	var paper = Raphael(wrapper, width, height);
@@ -54,12 +72,14 @@ blacker.blackOut = function (wrapper, width, height) {
 			}, 500, '>')
 			.runAnimationQueue();
 };
-
-
-function black1(paper, wWin, hWin) {
+</textarea>
+<textarea id="style2" class="blind">
+var blacker = blackout.blacker();
+blacker.blackOut = function (wrapper, width, height) {
+	var paper = Raphael(wrapper, width, height);	
 	for (var i = 1; i < 10; i++) {
 		(function () {
-			var cx = wWin/10 * i;
+			var cx = width/10 * i;
 			var r = (Math.random() * (1<<30)) % 500;
 			setTimeout(function () {
 				paper
@@ -69,7 +89,7 @@ function black1(paper, wWin, hWin) {
 						'fill': '#000'
 					})
 					.addAnimationQueue({
-						'cy': hWin/2	
+						'cy': height/2	
 					}, 1200, 'elastic')
 					.addAnimationQueue({
 						'r': r
@@ -80,10 +100,15 @@ function black1(paper, wWin, hWin) {
 					.runAnimationQueue();
 			}, 150 * i);
 		}());
-	}
-}
+	}	
+};
+</textarea>
 
-function black(paper, wWin, hWin) {
+<textarea id="style3" class="blind">
+var blacker = blackout.blacker();
+blacker.blackOut = function (wrapper, width, height) {
+	var paper = Raphael(wrapper, width, height);
+	
 	var COUNT = 15;
 	
 	function rand() {
@@ -95,10 +120,10 @@ function black(paper, wWin, hWin) {
 			var idx = i,
 				isLastCircle = idx === (COUNT - 1),
 				color = rand().toString(16).replace(/.*(\w{3})/, '#$1'),
-				x = rand() % wWin,
-				y = rand() % hWin,
+				x = rand() % width,
+				y = rand() % height,
 				r = isLastCircle
-						? Math.max(wWin, hWin) + 300
+						? Math.max(width, height) + 300
 						: rand() % 300 + 100,
 				duration = isLastCircle ? 7000 : 3500,
 				ease = 'elastic',
@@ -116,7 +141,21 @@ function black(paper, wWin, hWin) {
 			}, delay);
 		}());
 	}
-}
+};
+</textarea>
+
+<script>
+$('button').click(function (e) {
+	var id = $(this).attr('id').split('-')[1];
+	var js = $('#' + id).val();
+	
+	$('#code').replaceWith('<pre id="code" class="brush:js"></pre>');
+	$('#code').text(js);
+	
+	SyntaxHighlighter.highlight();	
+	
+	eval(js);
+});
 </script>
 </body>
 </html>

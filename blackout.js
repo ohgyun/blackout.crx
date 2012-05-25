@@ -21,7 +21,6 @@ var blackout = (function () {
 	}
 	
 	function blackOut() {
-		console.log(isNotCurrentTab() || isAlreadyBlacked())
 		if (isNotCurrentTab() || isAlreadyBlacked()) {
 			return;
 		}
