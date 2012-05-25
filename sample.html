@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>blackout</title>
+</head>
+<body>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
+<script type="text/javascript" src="blackout.js"></script>
+<script>
+(function defineCustomRaphaelMethod() {
+	
+	Raphael.el.addAnimationQueue = function (attr, delay, ease) {
+		this.animQueue = this.animQueue || [];
+		this.animQueue.push({
+			attr: attr,
+			delay: delay,
+			ease: ease
+		});
+		
+		return this;
+	};
+	
+	Raphael.el.runAnimationQueue = function () {
+		var idx = 0;
+		(function () {
+			var anim = this.animQueue && this.animQueue[idx++];
+			if (anim) {
+				this.animate(anim['attr'], anim['delay'], anim['ease'], arguments.callee);
+			} else {
+				this.animQueue = [];
+			}
+		}).call(this);
+		
+		return this;
+	};
+	
+}());
+
+var blacker = blackout.blacker();
+blacker.blackOut = function (wrapper, width, height) {
+	var paper = Raphael(wrapper, width, height);
+	paper.circle(width/2, -50, 3)
+			.attr({
+				'stroke': 'none',
+				'fill': '#000'
+			})
+			.addAnimationQueue({
+				'cy': height/2	
+			}, 1200, 'elastic')
+			.addAnimationQueue({
+				'r': Math.max(width, height)
+			}, 500, '>')
+			.runAnimationQueue();
+};
+
+
+function black1(paper, wWin, hWin) {
+	for (var i = 1; i < 10; i++) {
+		(function () {
+			var cx = wWin/10 * i;
+			var r = (Math.random() * (1<<30)) % 500;
+			setTimeout(function () {
+				paper
+					.circle(cx, 50, 3)
+					.attr({
+						'stroke': 'none',
+						'fill': '#000'
+					})
+					.addAnimationQueue({
+						'cy': hWin/2	
+					}, 1200, 'elastic')
+					.addAnimationQueue({
+						'r': r
+					}, 500, '>')
+					.addAnimationQueue({
+						'r': r * 3
+					}, 1500, 'backIn')
+					.runAnimationQueue();
+			}, 150 * i);
+		}());
+	}
+}
+
+function black(paper, wWin, hWin) {
+	var COUNT = 15;
+	
+	function rand() {
+		return parseInt(Math.random() * (1<<30));
+	}
+	
+	for (var i = 0; i < COUNT; i++) {
+		(function () {
+			var idx = i,
+				isLastCircle = idx === (COUNT - 1),
+				color = rand().toString(16).replace(/.*(\w{3})/, '#$1'),
+				x = rand() % wWin,
+				y = rand() % hWin,
+				r = isLastCircle
+						? Math.max(wWin, hWin) + 300
+						: rand() % 300 + 100,
+				duration = isLastCircle ? 7000 : 3500,
+				ease = 'elastic',
+				delay = 100 * idx * (1 + idx*0.05);
+			
+			setTimeout(function () {
+				paper
+					.circle(x, y, 1).attr({
+						'stroke': 'none',
+						'fill': color
+					})
+					.animate({
+						'r': r
+					}, duration, ease);
+			}, delay);
+		}());
+	}
+}
+</script>
+</body>
+</html>
